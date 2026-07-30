@@ -1,0 +1,15 @@
+{% extends 'PrivatePerson_Page/admin.html' %}
+
+{% block category %}
+<div class="admin-section">
+    <h3><i class="bi bi-plus-circle"></i> 添加标签</h3>
+    <form action="" method="post" style="max-width:400px;">
+        {% csrf_token %}
+        <div class="form-group">
+            <label class="form-label">标签名称</label>
+            <input class="form-input" type="text" name="tag" placeholder="输入标签名" maxlength="10">
+        </div>
+        <button type="submit" class="btn btn-primary">添加</button>
+    </form>
+</div>
+{% endblock %}

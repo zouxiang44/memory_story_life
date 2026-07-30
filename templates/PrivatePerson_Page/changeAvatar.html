@@ -1,0 +1,75 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>修改头像 · 潇湘叙事驿</title>
+    <link rel="shortcut icon" href='{% static 'img/website_loge.svg' %}'>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+<a class="auth-back" href="{% url 'home' %}"><i class="bi bi-arrow-left"></i> 返回首页</a>
+
+<div class="standalone-page">
+    <div class="auth-card" style="text-align:center;">
+        <div class="auth-header">
+            <h2>修改头像</h2>
+            <p>选择一张代表你的图片</p>
+        </div>
+        <form action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group" style="text-align:center;">
+                <label for="myfile">
+                    <img id="avatar-preview" src="/media/{{ request.user.avatar }}/" alt=""
+                         class="avatar-preview">
+                </label>
+                <input type="file" id="myfile" style="display:none;" accept="image/*">
+                <span class="form-error" style="display:block; margin-top:8px;"></span>
+            </div>
+            <p style="font-size:0.82rem; color:var(--c-text-light);">点击图片选择新头像</p>
+            <button type="button" class="btn btn-primary" style="width:100%; margin-top:8px; padding:12px;">确认上传</button>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    let myfile = document.getElementById('myfile');
+    let img = document.getElementById('avatar-preview');
+    let error_region = document.getElementsByClassName('form-error')[0];
+    const csrf = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    img.addEventListener('click', function(){ myfile.click(); })
+
+    myfile.addEventListener('change', function(){
+        let filereader = new FileReader();
+        let file = this.files[0];
+        filereader.readAsDataURL(file);
+        filereader.onload = function(){ img.src = filereader.result; }
+    })
+
+    document.querySelector('button[type="button"]').addEventListener('click', function(){
+        let file = myfile.files[0];
+        if(!file){
+            error_region.innerText = '您没有选择头像';
+        }else{
+            let formdata = new FormData();
+            formdata.append('username','{{ request.user.username }}');
+            formdata.append('avatar', file);
+            axios({
+                url:'/app01/setavatar/',
+                method:'post',
+                headers:{ 'X-CSRFToken': csrf },
+                data:formdata,
+            }).then((response)=>{
+                window.location.href = response.data.message;
+            })
+        }
+    })
+
+    img.addEventListener('click', function(){ error_region.innerText = ''; })
+</script>
+</body>
+</html>

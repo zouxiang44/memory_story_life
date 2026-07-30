@@ -1,0 +1,47 @@
+{% extends 'PrivatePerson_Page/admin.html' %}
+
+{% block article %}
+<div class="admin-section">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+        <h3 style="margin-bottom:0; border-bottom:none; padding-bottom:0;"><i class="bi bi-journal-text"></i> 文章管理</h3>
+        <a class="btn btn-sage btn-sm" href="{% url 'app01:AdminArticleAdd' %}"><i class="bi bi-plus-lg"></i> 添加文章</a>
+    </div>
+    <div style="overflow-x:auto;">
+    <table class="table-modern">
+        <thead>
+            <tr>
+                <th>标题</th>
+                <th>内容摘要</th>
+                <th>发布时间</th>
+                <th><i class="bi bi-hand-thumbs-up"></i></th>
+                <th><i class="bi bi-hand-thumbs-down"></i></th>
+                <th><i class="bi bi-chat"></i></th>
+                <th style="width:200px;">操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for article_obj in article_queryset %}
+            <tr>
+                <td><strong>{{ article_obj.title }}</strong></td>
+                <td><div class="table-content-cell">{{ article_obj.content }}</div></td>
+                <td style="white-space:nowrap;">{{ article_obj.create_date|date:'Y-m-d' }}</td>
+                <td>{{ article_obj.nums_up }}</td>
+                <td>{{ article_obj.nums_down }}</td>
+                <td>{{ article_obj.nums_comment }}</td>
+                <td>
+                    <div class="table-actions">
+                        <a class="action-edit" href="{% url 'app01:AdminArticleEdit' %}?id={{ article_obj.id }}">
+                            <i class="bi bi-pencil"></i> 编辑
+                        </a>
+                        <a class="action-delete" href="{% url 'app01:AdminArticleDelete' %}?id={{ article_obj.id }}">
+                            <i class="bi bi-trash"></i> 删除
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+</div>
+{% endblock %}

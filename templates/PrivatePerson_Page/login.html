@@ -1,0 +1,72 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 · 潇湘叙事驿</title>
+    <link rel="shortcut icon" href='{% static 'img/website_loge.svg' %}'>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+<a class="auth-back" href="{% url 'home' %}"><i class="bi bi-arrow-left"></i> 返回首页</a>
+
+<div class="standalone-page">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h2>欢迎回来</h2>
+            <p>登录你的叙事驿账号</p>
+        </div>
+        <form action="" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label class="form-label" for="username">用户名</label>
+                <input class="form-input" id="username" type="text" name="username" placeholder="请输入用户名" autocomplete="username">
+                <span class="form-error"></span>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="password">密码</label>
+                <input class="form-input" id="password" type="password" name="password" placeholder="请输入密码" autocomplete="current-password">
+                <span class="form-error"></span>
+            </div>
+            <button type="button" class="btn btn-primary" style="width:100%; margin-top:8px; padding:12px;">登 录</button>
+        </form>
+        <div class="auth-footer">
+            还没有账号？<a href="{% url 'app01:Register' %}">立即注册</a>
+        </div>
+    </div>
+</div>
+
+<div class="footer-beian">{% include 'beianhao.html' %}</div>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    let form = document.getElementsByTagName('form')[0]
+    let submit = document.querySelector('button[type="button"]')
+    let error_region = document.getElementsByClassName('form-error')
+    let inputs = document.getElementsByTagName('input')
+
+    submit.addEventListener('click', function(){
+        let dataform = new FormData(form);
+        axios({
+            url:'/app01/login/',
+            method:'post',
+            data:dataform,
+        }).then((response)=>{
+            if(response.data.code === 0){
+                window.location.href = response.data.message
+            }else{
+                error_region[0].innerText = response.data.message
+            }
+        })
+    })
+
+    Array.from(inputs).forEach(function(key){
+        key.addEventListener('focus', function(){
+            this.nextElementSibling.innerText = '';
+        })
+    })
+</script>
+</body>
+</html>

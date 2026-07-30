@@ -1,0 +1,32 @@
+{% extends 'basePage.html' %}
+
+{% block css %}
+    .intro-panel { display: none !important; }
+    {% block css_next %}{% endblock %}
+{% endblock %}
+
+{% block content %}
+<a class="back-link" href="{% url 'home' %}"><i class="bi bi-arrow-left"></i> 返回首页</a>
+
+<div class="admin-tabs reveal">
+    <a class="admin-tab" href="{% url 'app01:AdminAuthor' %}"><i class="bi bi-person"></i> 作者编辑</a>
+    <a class="admin-tab" href="{% url 'app01:AdminBlog' %}"><i class="bi bi-globe"></i> 站点编辑</a>
+    <a class="admin-tab" href="{% url 'app01:AdminTag' %}"><i class="bi bi-tags"></i> 标签编辑</a>
+    <a class="admin-tab" href="{% url 'app01:AdminCategory' %}"><i class="bi bi-folder"></i> 分类编辑</a>
+    <a class="admin-tab" href="{% url 'app01:AdminArticle' %}"><i class="bi bi-journal-text"></i> 文章编辑</a>
+    <a class="admin-tab" href="{% url 'app01:AdminComment' %}"><i class="bi bi-chat-dots"></i> 评论编辑</a>
+</div>
+
+{% block author %}{% endblock %}
+{% block blog %}{% endblock %}
+{% block tag %}{% endblock %}
+{% block category %}{% endblock %}
+{% block article %}{% endblock %}
+{% block comment %}{% endblock %}
+
+{% include 'beianhao.html' %}
+{% endblock %}
+
+{% block js %}
+    {% block js_next %}{% endblock %}
+{% endblock %}

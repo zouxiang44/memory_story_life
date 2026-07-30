@@ -1,0 +1,27 @@
+{% extends 'basePage.html' %}
+{% load static %}
+
+{% block content %}
+<div style="max-width:720px;">
+  {% for article_obj in article_list %}
+  <article class="article-card reveal reveal-d{{ forloop.counter0 }}">
+    <h6 class="article-title">
+      <a href="/app02/{{ article_obj.blog.person.username }}/{{ article_obj.id }}/">
+        {{ article_obj.title }}
+      </a>
+    </h6>
+    <div class="article-desc">{{ article_obj.desc }}</div>
+    <div class="article-meta">
+      <span><i class="bi bi-pencil-fill"></i> {{ article_obj.create_date|date:'Y-m-d' }}</span>
+      <span><i class="bi bi-person-fill"></i>
+        <a href="/app02/{{ article_obj.blog.person.username }}/">{{ article_obj.blog.person.username }}</a>
+      </span>
+      <span class="meta-up"><i class="bi bi-hand-thumbs-up-fill"></i> {{ article_obj.nums_up }}</span>
+      <span class="meta-down"><i class="bi bi-hand-thumbs-down-fill"></i> {{ article_obj.nums_down }}</span>
+      <span class="meta-comment"><i class="bi bi-chat-left-dots-fill"></i> {{ article_obj.nums_comment }}</span>
+    </div>
+  </article>
+  {% endfor %}
+</div>
+{% include 'beianhao.html' %}
+{% endblock %}

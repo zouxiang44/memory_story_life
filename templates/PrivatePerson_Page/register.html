@@ -1,0 +1,95 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册 · 潇湘叙事驿</title>
+    <link rel="shortcut icon" href='{% static 'img/website_loge.svg' %}'>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+<a class="auth-back" href="{% url 'home' %}"><i class="bi bi-arrow-left"></i> 返回首页</a>
+
+<div class="standalone-page">
+    <div class="auth-card" style="max-width:480px;">
+        <div class="auth-header">
+            <h2>加入叙事驿</h2>
+            <p>开始记录你的故事</p>
+        </div>
+        <form action="" method="post">
+            {% csrf_token %}
+            {% for form in forms %}
+            <div class="form-group">
+                <label class="form-label" for="{{ form.auto_id }}">{{ form.label }}</label>
+                {{ form }}
+                <span class="form-error"></span>
+            </div>
+            {% endfor %}
+
+            <div class="form-group">
+                <label class="form-label">选择头像</label>
+                <label for="myfile" class="form-file-label">
+                    <img id="avatar-preview" src="{% static 'img/default_avatar.jpg' %}" alt=""
+                         class="avatar-preview" style="width:64px; height:64px; border-width:2px;">
+                    <span>点击选择头像</span>
+                </label>
+                <input type="file" id="myfile" style="display:none;" accept="image/*">
+            </div>
+
+            <button type="button" class="btn btn-primary" style="width:100%; margin-top:8px; padding:12px;">注 册</button>
+        </form>
+        <div class="auth-footer">
+            已有账号？<a href="{% url 'app01:Login' %}">立即登录</a>
+        </div>
+    </div>
+</div>
+
+<div class="footer-beian">{% include 'beianhao.html' %}</div>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    let form = document.getElementsByTagName('form')[0]
+    let myfile = document.getElementById('myfile')
+    let preview = document.getElementById('avatar-preview')
+    let submit = document.querySelector('button[type="button"]')
+
+    myfile.addEventListener('change', function(){
+        let filereader = new FileReader();
+        let file = this.files[0];
+        filereader.readAsDataURL(file);
+        filereader.onload = function(){ preview.src = filereader.result; }
+    })
+
+    submit.addEventListener('click', function(){
+        let dataform = new FormData(form);
+        let avatar = myfile.files[0]
+        dataform.append('avatar', avatar)
+        axios({
+            url:'/app01/register/',
+            method:'post',
+            data:dataform
+        }).then((response)=>{
+            if(response.data.code === 0){
+                window.location.href = response.data.message
+            }else{
+                Object.keys(response.data.message).forEach((key)=>{
+                    let el = document.getElementById('id_'+key)
+                    if(el && el.nextElementSibling)
+                        el.nextElementSibling.innerText = response.data.message[key]
+                })
+            }
+        })
+    })
+
+    let inputs = document.getElementsByTagName('input')
+    Array.from(inputs).forEach(function(key){
+        key.addEventListener('focus', function(){
+            let sib = this.nextElementSibling;
+            if(sib) sib.innerText = '';
+        })
+    })
+</script>
+</body>
+</html>

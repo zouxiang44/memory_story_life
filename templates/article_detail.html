@@ -1,0 +1,148 @@
+{% extends 'basePage.html' %}
+
+{% block css %}
+    .intro-panel { display: none !important; }
+{% endblock %}
+
+{% block content %}
+<a class="back-link" href="{% url 'home' %}"><i class="bi bi-arrow-left"></i> 返回首页</a>
+
+<div class="detail-wrap">
+    <h1 class="detail-title">{{ article_obj.title }}</h1>
+
+    <div class="detail-content">{{ article_obj.content }}</div>
+
+    {% if request.user.is_authenticated %}
+    <div class="detail-meta">
+        <span><i class="bi bi-pencil-fill"></i> {{ article_obj.create_date|date:'Y-m-d' }}</span>
+        <span><i class="bi bi-person-fill"></i>
+            <a href="/app02/{{ article_obj.blog.person.username }}/">{{ article_obj.blog.person.username }}</a>
+        </span>
+        <span class="up up_downs">
+            <i class="bi bi-hand-thumbs-up-fill"></i>
+            <span>{{ article_obj.nums_up }}</span>
+        </span>
+        <span class="down up_downs">
+            <i class="bi bi-hand-thumbs-down-fill"></i>
+            <span>{{ article_obj.nums_down }}</span>
+        </span>
+        <span><i class="bi bi-chat-left-dots-fill"></i> {{ article_obj.nums_comment }}</span>
+    </div>
+
+    <div class="comments-section">
+        <div class="comments-header"><i class="bi bi-chat-dots"></i> 评论区</div>
+        <div class="comments-list">
+            <ul class="comments_son" style="list-style:none; padding:0; margin:0;">
+                {% for comment in comment_list %}
+                <li class="comment-item">
+                    {% if comment.parent %}
+                    <span class="comment-parent">回复 {{ comment.parent.user }} &larr;</span>
+                    {% endif %}
+                    <span class="comment-author">{{ comment.user.username }}:</span>
+                    {{ comment.content }}
+                    <span class="comment-reply reply_to">回复</span>
+                    <span class="reply_id" style="display:none;">{{ comment.id }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="comment-form">
+            <label for="comment-area">发表评论</label>
+            <textarea id="comment-area" class="form-textarea" placeholder="写下你的想法..."></textarea>
+            <div style="margin-top:12px; text-align:right;">
+                <button class="btn btn-primary textarea" type="button">提交评论</button>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <div class="card-glass" style="padding:28px; text-align:center; margin-top:20px;">
+        <p style="color:var(--c-text-muted); margin-bottom:12px;">登录后才能查看或发表评论</p>
+        <a class="btn btn-primary" href="{% url 'app01:Login' %}">立即登录</a>
+        <a class="btn btn-outline" href="{% url 'home' %}" style="margin-left:8px;">随便逛逛</a>
+    </div>
+    {% endif %}
+</div>
+
+{% include 'beianhao.html' %}
+{% csrf_token %}
+{% endblock %}
+
+{% block js %}
+    let up_downs = document.getElementsByClassName('up_downs');
+    let csrf = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    Array.from(up_downs).forEach(function(up_down){
+        let kind;
+        up_down.addEventListener('click',function(){
+            if(up_down.classList.contains('up')){
+                kind = 'up';
+            }else{
+                kind = 'down';
+            }
+            axios({
+                headers:{ 'X-CSRFToken': csrf },
+                url:'/app02/updown/',
+                method:'post',
+                params:{ article_id:{{ article_obj.id }}, kind:kind }
+            }).then(function(response){
+                let span = up_down.children[1];
+                let number = Number(span.innerText);
+                if(response.data.code === 1001){
+                    span.innerText = String(number+1);
+                    up_down.classList.add(up_down.classList.contains('up') ? 'up-active' : 'down-active');
+                }else{
+                    span.innerText = String(number-1);
+                    up_down.classList.remove('up-active', 'down-active');
+                }
+            })
+        })
+    });
+
+    let comments = document.getElementsByClassName('comments_son')[0];
+    let comment_area = document.getElementById('comment-area');
+    let comment_submit = document.getElementsByClassName('textarea')[0];
+    let parent_id = null;
+    let parent_username = null;
+
+    comment_submit.addEventListener('click', function(){
+        let sayer = '{{ request.user.username }}';
+        let article = '{{ article_obj.title }}';
+        let content = comment_area.value;
+        if(!content.trim()) return;
+
+        axios({
+            headers:{ 'X-CSRFToken':csrf },
+            url:'/app02/comments/',
+            method:'post',
+            data:{ parent:parent_id, sayer:sayer, article:article, content:content }
+        }).then(function(response){
+            let comment = document.createElement('li');
+            comment.className = 'comment-item';
+            if (parent_username){
+                comment.innerHTML += `<span class="comment-parent">回复 ${parent_username} &larr;</span>`
+            }
+            comment.innerHTML +=
+                `<span class="comment-author">${sayer}:</span> ${content}
+                 <span class="comment-reply reply_to">回复</span>
+                 <span class="reply_id" style="display:none;">${response.data.id||''}</span>`;
+            comments.appendChild(comment);
+            window.location.reload();
+            parent_id = null;
+            parent_username = null;
+        })
+        comment_area.value = '';
+    })
+
+    let replies = document.getElementsByClassName('reply_to');
+    Array.from(replies).forEach( reply => {
+        reply.addEventListener('click',()=>{
+            let reply_to_name = reply.parentNode.querySelector('.comment-author').innerText.slice(0,-1);
+            let reply_to_id = reply.parentNode.querySelector('.reply_id').innerText;
+            comment_area.focus();
+            parent_username = reply_to_name;
+            parent_id = reply_to_id;
+        })
+    })
+{% endblock %}

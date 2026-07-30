@@ -1,0 +1,35 @@
+{% extends 'PrivatePerson_Page/admin.html' %}
+
+{% block comment %}
+<div class="admin-section">
+    <h3><i class="bi bi-chat-dots"></i> 文章评论</h3>
+    <div style="overflow-x:auto;">
+    <table class="table-modern">
+        <thead>
+            <tr>
+                <th style="width:45%;">评论内容</th>
+                <th style="width:20%;">对应文章</th>
+                <th style="width:15%;">评论者</th>
+                <th style="width:20%;">操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for comment_obj in comment_queryset %}
+            <tr>
+                <td><div class="table-content-cell">{{ comment_obj.content }}</div></td>
+                <td>{{ comment_obj.article.title }}</td>
+                <td>{{ comment_obj.user.username }}</td>
+                <td>
+                    <div class="table-actions">
+                        <a class="action-delete" href="{% url 'app01:AdminCommentDelete' %}?id={{ comment_obj.id }}">
+                            <i class="bi bi-trash"></i> 删除
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+</div>
+{% endblock %}

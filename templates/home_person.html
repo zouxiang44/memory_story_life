@@ -1,0 +1,83 @@
+{% extends 'basePage.html' %}
+{% load static %}
+
+{% block css_file %}
+    <link rel="stylesheet" href="/media/{{ request.user.blog.site_theme }}/">
+{% endblock %}
+
+{% block css %}
+    .intro-panel { display: none !important; }
+    .detail { display: none; }
+    @media (min-width: 1025px) {
+        .detail { display: flex; flex-direction: column; gap: 16px; }
+    }
+{% endblock %}
+
+{% block content %}
+<a class="back-link" href="{% url 'home' %}"><i class="bi bi-arrow-left"></i> 返回首页</a>
+
+<div style="display:flex; gap:32px; align-items:flex-start;">
+  <div style="flex:1; max-width:720px; min-width:0;">
+    {% for article_obj in article_list %}
+    <article class="article-card reveal reveal-d{{ forloop.counter0 }}">
+      <h6 class="article-title">
+        <a href="/app02/{{ article_obj.blog.person.username }}/{{ article_obj.id }}/">
+          {{ article_obj.title }}
+        </a>
+      </h6>
+      <div class="article-desc">{{ article_obj.desc }}</div>
+      <div class="article-meta">
+        <span><i class="bi bi-pencil-fill"></i> {{ article_obj.create_date|date:'Y-m-d' }}</span>
+        <span><i class="bi bi-person-fill"></i>
+          <a href="/app02/{{ request.user.username }}/">{{ article_obj.blog.person.username }}</a>
+        </span>
+        <span class="meta-up"><i class="bi bi-hand-thumbs-up-fill"></i> {{ article_obj.nums_up }}</span>
+        <span class="meta-down"><i class="bi bi-hand-thumbs-down-fill"></i> {{ article_obj.nums_down }}</span>
+        <span class="meta-comment"><i class="bi bi-chat-left-dots-fill"></i> {{ article_obj.nums_comment }}</span>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+
+  <div class="sidebar">
+    <div class="sidebar-card author-card">
+      <img class="author-avatar" src="/media/{{ user.avatar }}/" alt="">
+      <div class="author-name">{{ user.blog.site_title }}</div>
+      <div class="author-info">
+        作者: {{ user.username }}<br>
+        电话: {{ user.phone|default:'未填写' }}<br>
+        邮箱: {{ user.email|default:'未填写' }}
+      </div>
+    </div>
+
+    <div class="sidebar-card">
+      <h6><i class="bi bi-tags"></i> 文章标签</h6>
+      {% for tag in tags_list %}
+      <a class="sidebar-tag" href="/app02/{{ user.username }}/tag/{{ tag.0 }}/">
+        {{ tag.0 }} <small style="opacity:0.7">{{ tag.1 }}</small>
+      </a>
+      {% endfor %}
+    </div>
+
+    <div class="sidebar-card">
+      <h6><i class="bi bi-folder"></i> 文章分类</h6>
+      {% for category in category_list %}
+      <a class="sidebar-tag" href="/app02/{{ username }}/category/{{ category.0 }}/">
+        {{ category.0 }} <small style="opacity:0.7">{{ category.1 }}</small>
+      </a>
+      {% endfor %}
+    </div>
+
+    <div class="sidebar-card">
+      <h6><i class="bi bi-calendar3"></i> 发布时间</h6>
+      {% for date in date_list %}
+      <a class="sidebar-date" href="/app02/{{ username }}/date/{{ date.0|date:'Y-m-d' }}/">
+        {{ date.0|date:'Y-m' }} &middot; {{ date.1 }} 篇
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{% include 'beianhao.html' %}
+{% endblock %}

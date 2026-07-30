@@ -1,0 +1,37 @@
+{% extends 'PrivatePerson_Page/admin.html' %}
+
+{% block tag %}
+<div class="admin-section">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+        <h3 style="margin-bottom:0; border-bottom:none; padding-bottom:0;"><i class="bi bi-tags"></i> 文章标签</h3>
+        <a class="btn btn-sage btn-sm" href="{% url 'app01:AdminTagAdd' %}"><i class="bi bi-plus-lg"></i> 添加标签</a>
+    </div>
+    <div style="overflow-x:auto;">
+    <table class="table-modern">
+        <thead>
+            <tr>
+                <th>标签名称</th>
+                <th style="width:200px;">操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tag_obj in tag_queryset %}
+            <tr>
+                <td><strong>{{ tag_obj.name }}</strong></td>
+                <td>
+                    <div class="table-actions">
+                        <a class="action-edit" href="{% url 'app01:AdminTagEdit' %}?id={{ tag_obj.id }}">
+                            <i class="bi bi-pencil"></i> 编辑
+                        </a>
+                        <a class="action-delete" href="{% url 'app01:AdminTagDelete' %}?id={{ tag_obj.id }}">
+                            <i class="bi bi-trash"></i> 删除
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+</div>
+{% endblock %}

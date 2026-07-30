@@ -1,0 +1,70 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>修改用户名 · 潇湘叙事驿</title>
+    <link rel="shortcut icon" href='{% static 'img/website_loge.svg' %}'>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+<a class="auth-back" href="{% url 'home' %}"><i class="bi bi-arrow-left"></i> 返回首页</a>
+
+<div class="standalone-page">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h2>修改用户名</h2>
+            <p>为你的账号取一个新名字</p>
+        </div>
+        <form action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label class="form-label">当前用户名</label>
+                <input class="form-input" type="text" name="old_username" id="old_username"
+                       value="{{ request.user.username }}" readonly>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="new_username">新用户名</label>
+                <input class="form-input" type="text" name="new_username" id="new_username"
+                       placeholder="最多3个字符" maxlength="3">
+                <span class="form-error"></span>
+            </div>
+            <button type="button" class="btn btn-primary" style="width:100%; margin-top:8px; padding:12px;">确认修改</button>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    let old_username = document.getElementById('old_username');
+    let new_username = document.getElementById('new_username');
+    let error_region = document.getElementsByClassName('form-error')[0];
+    let submit = document.querySelector('button[type="button"]');
+
+    submit.addEventListener('click', function(){
+        let username = new_username.value;
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        if(!username){
+            error_region.innerText = '请输入新用户名';
+        }else if(username.length > 3){
+            error_region.innerText = '长度必须小于等于3';
+        }else{
+            axios({
+                url:'/app01/setusername/',
+                method:'post',
+                headers: { 'X-CSRFToken': csrftoken },
+                data:{ 'old_username':'{{ request.user.username }}', 'new_username':username }
+            }).then(function(response){
+                window.location.href = response.data.message;
+            })
+        }
+    })
+
+    new_username.addEventListener('focus', function(){
+        error_region.innerText = '';
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>页面不存在 · 潇湘叙事驿</title>
+    <link rel="shortcut icon" href='{% static 'img/website_loge.svg' %}'>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+<div class="error-page">
+    <div class="error-code">404</div>
+    <div class="error-msg">抱歉，您访问的资源不存在</div>
+    <div class="error-hint">可能是网址有误，或者对应的内容已被删除</div>
+    <a class="btn btn-primary" href="{% url 'home' %}" style="margin-top:24px;">
+        <i class="bi bi-house"></i> 回到首页
+    </a>
+</div>
+</body>
+</html>
